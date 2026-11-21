@@ -1,0 +1,14 @@
+# Replace @kashimo-cmd per line with the sub-team members' GitHub handles
+*                  @kashimo-cmd
+/common/           @kashimo-cmd
+/pi/controller/    @kashimo-cmd
+/pi/video/         @kashimo-cmd
+/pi/ai/            @kashimo-cmd
+/pc/server/        @kashimo-cmd
+/pc/web/           @kashimo-cmd
+/config/           @kashimo-cmd
+/tools/            @kashimo-cmd
+/tests/            @kashimo-cmd
+/systemd/          @kashimo-cmd
+/docs/             @kashimo-cmd
+/.github/          @kashimo-cmd

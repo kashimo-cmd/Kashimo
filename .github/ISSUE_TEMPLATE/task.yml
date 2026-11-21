@@ -1,0 +1,23 @@
+name: Task
+description: One task of docs/design.md (K01-K17)
+labels: [task]
+body:
+  - type: input
+    id: task_id
+    attributes:
+      label: Task ID
+      placeholder: K05
+    validations:
+      required: true
+  - type: textarea
+    id: needs
+    attributes:
+      label: Needs
+      description: Tasks that must be merged first
+  - type: textarea
+    id: done
+    attributes:
+      label: Done when
+      description: Copy the Done line of the task in docs/design.md section 1
+    validations:
+      required: true
