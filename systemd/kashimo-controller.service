@@ -1,0 +1,16 @@
+[Unit]
+Description=Kashimo controller (motors, sensors, WebSocket)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=@USER@
+SupplementaryGroups=gpio i2c
+WorkingDirectory=@ROOT@
+Environment=HW_MODE=pi
+ExecStart=@ROOT@/venv/bin/python -m pi.controller.main
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target
