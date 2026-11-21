@@ -1,16 +1,17 @@
-# Kashimo: design and build plan v4 (ACTIA gallery inspection robot)
+# Kashimo: design and build plan v4.2 (ACTIA gallery inspection robot)
 
-IAS Challenge TSYP14, Phase 2 · v4.1 of 21 November 2026 · replaces v3 (v3 keeps the old conflict table C1-C39).
+IAS Challenge TSYP14, Phase 2 · v4.2 of 21 November 2026 · replaces v4.1 · v3 keeps the old conflict table C1-C39.
 Tags: **[NEW]** v4 change · **[PICK]** option chosen · **[CALC]** my arithmetic · **[EST]** estimate, not verified · **[CHECK]** test before relying on it.
 
 **v4 changes:** (1) AI runs **on the Pi 5**, not on the PC. (2) Dev on a 16 GB card, move to 32 GB later through Git. (3) AI is a plug-in: dummy detector now, real files later. (4) Dashboard = web page, design rules in section 7. (5) The file is split into tasks K01-K17, one task = one Claude prompt.
 **v4.1 fixes:** site geometry (gallery 2+ m wide, slabs 0.5 m wide spanning it, faults = cuts, burns, water), body 300 x 200 x 100 mm under 3 kg, slab resolution 0.5 m, heading snap off by default, water and safety section 8.5.
+**v4.2 changes [NEW]:** the real Pi 5 and the USB camera are in the team's hands, 16 GB card in use, 32 GB card not yet arrived. (1) **Build order changed: real video first** (K00 + K10), then PC server and dashboard, then Pi controller. The old plan built the PC side against the fake Pi first. (2) New task **K00 Pi first boot** and a status column in the task table. (3) Section 1.1 explains old plan vs new plan. (4) Section 3.1 lists the hardware in hand and the 16 GB card rules. (5) Section 9 lists which tests can run now. (6) Section 0 rule 10. **No contract in section 4 changed** (K02 and K03 stay valid).
 
 ---
 
 ## 0. RULES FOR THE AI READING THIS FILE
 
-Prompt the user pastes: *"Read Kashimo_design_v4.md. Do task K05. Follow section 0."*
+Prompt the user pastes: *"Read Kashimo_design_v4.md. Do task K05. Follow section 0."* (file name is now `Kashimo_design_v4_2.md`; the repo copy is `docs/design.md`.)
 
 1. Do ONLY the named task. Read section 0, section 4 (contracts) and the sections the task lists. Nothing else.
 2. Output = files made with `create_file` at the exact repo path under `/mnt/user-data/outputs/`, then `present_files`. Then ONE note, 8 lines max:
@@ -22,32 +23,57 @@ Prompt the user pastes: *"Read Kashimo_design_v4.md. Do task K05. Follow section
 7. Python 3.11, asyncio. No library outside the stack in section 3.3.
 8. Never write "passed" for a test you did not run.
 9. UI tasks (K13-K15) also follow section 7. Anything that breaks section 7 is a failure.
+10. **[NEW v4.2] Real Pi in hand.** Claude has no access to it. For every task with a `# CHECK ON PI` part, Claude tests what it can on a PC (`--test-source`, `HW_MODE=mock`), writes `TEST: NOT RUN on Pi`, and gives the user the exact commands to run on the Pi plus what output to paste back. Claude never says a camera, pin or ffmpeg setting works on the real Pi until the user pasted proof.
 
 ---
 
 ## 1. TASKS
 
-Order: A (base) then B (Pi) and C (PC) in parallel, then D. Tests T1-T21 are in section 9. Each task lists its output, its spec sections, and when it is done.
+**Order (v4.2): A (base, done) then V (real video: K00, K10) then C (PC: K12-K15) then B (Pi controller: K04-K09) then D (K11, K16, K17).** The old order was A, then B and C in parallel, with video last. See 1.1. Tests T1-T25 are in section 9. Each task lists its output, its spec sections, and when it is done.
 
-| ID | Task | Needs |
+| ID | Task | Needs | Status (21 Nov 2026) |
+|---|---|---|---|
+| K00 | **Pi first boot and probe [NEW]** (user runs, Claude writes the commands) | none | TODO, do first |
+| K01 | Repo skeleton, config, setup.sh, systemd | none | DONE |
+| K02 | Protocol module and constants | K01 | DONE (delivered, 153 tests passed) |
+| K03 | Fake Pi (lets you build the PC side with no robot) | K02 | DONE (delivered, push to Git pending [CHECK]) |
+| K10 | **Video pipeline: ffmpeg, MediaMTX, SD recording (moved up)** | K01, K00 | NEXT |
+| K12 | PC server: relay, photo, screenshot, CSV | K02, K03 | after K10 |
+| K13 | Dashboard shell: tokens, layout, all states (static) | K12 | after K12 |
+| K14 | Dashboard logic: keys, commands, readouts, banners, video | K13, K10 | after K13 |
+| K15 | Dashboard map and log panel | K14 | after K14 |
+| K04 | Hardware layer with mock (`hw.py`) | K02 | after C |
+| K05 | Sensors: 3 ultrasonic, 2 encoders | K04 | after K04 |
+| K06 | Drive mixing, interlocks, STOP latch | K04 | after K04 |
+| K07 | Head (pan-tilt) and rod controllers | K04 | after K04 |
+| K08 | IMU and position (path map maths) | K04 | after K04 |
+| K09 | Controller main loop, WebSocket server, telemetry, events | K05-K08 | after K05-K08 |
+| K11 | AI plug-in: detector interface, dummy, ONNX loader, rules, worker | K09 | after K09, dummy only until the friend's files arrive |
+| K16 | Pi tools: AI benchmark, calibration, data recorder, latency test | K09 | after K09 |
+| K17 | Deploy: migration, health check | K09 | **postponed until the 32 GB card arrives** |
+
+The table is listed in the new build order. IDs did not change, so every old prompt ("Do task K05") still means the same task.
+
+### 1.1 Plan history: old plan vs new plan [NEW v4.2]
+| | Old plan (v4.1) | New plan (v4.2) |
 |---|---|---|
-| K01 | Repo skeleton, config, setup.sh, systemd | none |
-| K02 | Protocol module and constants | K01 |
-| K03 | Fake Pi (lets you build the PC side with no robot) | K02 |
-| K04 | Hardware layer with mock (`hw.py`) | K02 |
-| K05 | Sensors: 3 ultrasonic, 2 encoders | K04 |
-| K06 | Drive mixing, interlocks, STOP latch | K04 |
-| K07 | Head (pan-tilt) and rod controllers | K04 |
-| K08 | IMU and position (path map maths) | K04 |
-| K09 | Controller main loop, WebSocket server, telemetry, events | K05-K08 |
-| K10 | Video pipeline: ffmpeg, MediaMTX, SD recording | K01 |
-| K11 | AI plug-in: detector interface, dummy, ONNX loader, rules, worker | K09 |
-| K12 | PC server: relay, photo, screenshot, CSV | K02, K03 |
-| K13 | Dashboard shell: tokens, layout, all states (static) | K12 |
-| K14 | Dashboard logic: keys, commands, readouts, banners, video | K13 |
-| K15 | Dashboard map and log panel | K14 |
-| K16 | Pi tools: AI benchmark, calibration, data recorder, latency test | K09 |
-| K17 | Deploy: migration, health check | K09 |
+| Assumption | No Pi yet: build everything on a PC with mock hardware | **Pi 5 + USB camera in hand**, only the 32 GB card is missing |
+| Order | A, then B (Pi) and C (PC) in parallel, video (K10) among the last | A, then **V (K00, K10)**, then C, then B, then D |
+| First thing the user sees | A dashboard fed by the fake Pi (K03) and a PC webcam | **The real Pi camera on the PC**, then the dashboard on top of it |
+| First real test | After K09 and K10 | **After K10**: T8 (sharpness), T2 (video delay), cooling and CPU check |
+| Fake Pi (K03) | Main way to build the dashboard | Still used for robot controls (drive, head, rod) until K09 runs on the Pi. Video is real from K10 on |
+| K17 migration | Part of the main flow | Postponed. Stays valid for the 16 to 32 GB move (3.2) |
+| Card | 16 GB "for now" | 16 GB is the dev card (rules in 3.1). Nothing is skipped because of it |
+| Contracts (section 4) | frozen | **frozen, unchanged** |
+
+Why it changed: the old order delayed the one test that carries the most risk (does the Pi 5 stream 720p at 15 fps with a low delay while staying cool). It is now the first test.
+What did not change: task IDs, one task = one prompt, section 0 rules 1-9, K01-K03 outputs, mock mode for every Pi task, the 16 to 32 GB migration in 3.2.
+
+### K00 Pi first boot and probe [NEW v4.2]
+- Out: `docs/PI_FIRST_BOOT.md` (30 lines max), `tools/pi_probe.sh` (read-only, changes nothing).
+- Do: the doc gives the user exact steps: flash Pi OS Lite 64-bit (Bookworm) on the 16 GB card, enable SSH, set Wi-Fi and a fixed IP, update, `git clone`, camera on a **USB 2.0 port**, active cooler fitted. `pi_probe.sh` prints in one block: OS and Python version, `ls /dev/video*`, `v4l2-ctl --list-formats-ext` (is MJPEG 1280x720 15 fps offered), `ffmpeg -version`, `df -h /`, `free -m`, `vcgencmd measure_temp`, `vcgencmd get_throttled`, `iw dev wlan0 link`, `lsusb`, `i2cdetect -y 1` (may say not installed).
+- Done: `bash -n pi_probe.sh` ok. The user pastes the real output into the chat, and Claude reads the camera formats from it before writing K10 details.
+- This task is run by the user. Claude only writes the files.
 
 ### K01 Repo skeleton
 - Out: tree of 4.1 with stub files, `config/config.yaml` (4.2), `config/slabs.json` (`{"sample":true,"slab_width_m":0.5,"origin_m":0.0,"overrides":{}}`), `requirements-pi.txt`, `requirements-pc.txt`, `setup.sh` (Pi: apt, venv, pip, install units, make `runs/`), `systemd/kashimo-{mediamtx,video,controller,ai}.service`, `.gitignore` (`model/ runs/ *.db venv/ __pycache__/`), `README.md` 40 lines max (run in mock, run on Pi).
@@ -94,10 +120,12 @@ Order: A (base) then B (Pi) and C (PC) in parallel, then D. Tests T1-T21 are in 
 - Do: asyncio 50 ms loop wiring K04-K08. States MANUAL, STOPPED, LINK_LOST. Watchdog 500 ms. TELEMETRY 10 Hz. EVENTs stored in SQLite `robot.db`, replayed on SYNC. Slab from `slabs.json`. HTTP static `/alerts/`. Internal endpoints (4.5) for the AI worker. Link loss sets the latch.
 - Spec: 4.5, 5.1-5.7. Done: `HW_MODE=mock` run plus `ws_smoke.py`. Test: no heartbeat gives motors off within 0.5 s.
 
-### K10 Video
+### K10 Video (moved up to first real task) [NEW v4.2]
 - Out: `pi/video/mediamtx.yml`, `pi/video/pipeline.sh`, `pi/video/prune.sh`, `tools/check_video.sh`.
-- Do: ONE ffmpeg: V4L2 MJPEG 1280x720 15 fps in, output 1 = libx264 ultrafast zerolatency 2.5 Mbps to `rtsp://127.0.0.1:8554/cam`, output 2 = 2 fps full-size JPEG to `/run/kashimo/frames/latest.jpg` with `-update 1 -atomic_writing 1` (so the AI never decodes H.264). MediaMTX: WebRTC (WHEP) on 8889, RTSP on 8554, recording in 60 s segments. `prune.sh` deletes oldest segments above `rec_cap_gb`. `--test-source` uses a test pattern.
-- Done: `bash -n`, ffmpeg command runs with `--test-source` on a PC.
+- Do: ONE ffmpeg: V4L2 MJPEG 1280x720 15 fps in (device from env `CAM_DEV`, default `/dev/video0`), output 1 = libx264 ultrafast zerolatency 2.5 Mbps to `rtsp://127.0.0.1:8554/cam`, output 2 = 2 fps full-size JPEG to `/run/kashimo/frames/latest.jpg` with `-update 1 -atomic_writing 1` (so the AI never decodes H.264). MediaMTX: WebRTC (WHEP) on 8889, RTSP on 8554, recording in 60 s segments. `prune.sh` deletes oldest segments above `rec_cap_gb`. `--test-source` uses a test pattern. `check_video.sh` (run on the Pi) prints: stream fps, CPU %, temperature, throttle flag, and the URLs to open on the PC.
+- v4.2 additions: on the 16 GB card the user sets `rec_cap_gb: 3` in `config/config.yaml` (default in the file stays 8). `pipeline.sh` must start with no controller and no AI running (video is the first thing that works alone).
+- Done on PC: `bash -n`, ffmpeg command runs with `--test-source`.
+- Done on Pi (user, rule 10): `tools/check_video.sh` shows 15 fps and no throttling, and the stream opens in the PC browser or `ffplay rtsp://<pi_ip>:8554/cam`. User pastes the output. This is the first real run of T2 and T8.
 
 ### K11 AI plug-in
 - Out: `pi/ai/detectors/base.py`, `dummy.py`, `onnx_det.py`, `pi/ai/rules.py`, `pi/ai/worker.py`, `tools/make_dummy_onnx.py`, `tests/test_ai.py`.
@@ -107,6 +135,7 @@ Order: A (base) then B (Pi) and C (PC) in parallel, then D. Tests T1-T21 are in 
 ### K12 PC server
 - Out: `pc/server/app.py`, `photo.py`, `screenshot.py`, `csvlog.py`, `tests/test_server.py`.
 - Do: FastAPI + uvicorn. Serves `pc/web/`. Browser WebSocket `/ws` relays CONTROL and CMD to the Pi and fans out TELEMETRY and EVENT. **The server never creates heartbeats: only the browser does.** Pi client with auto-reconnect, SYNC(since_id) after reconnect. RTT from `hb_seq` and loss % over 10 s added to the stream sent to the browser. `POST /api/photo` (newest RTSP frame), `POST /api/screenshot` (mss), file names and CSV per 5.7, downloads alert images into `runs/<date_time>/alerts/`.
+- v4.2: `/api/photo` takes the newest frame from the **real Pi RTSP stream** when `video.rtsp_url` is set, else from `fake_pi`. Controls still come from `fake_pi` until K09 runs on the Pi.
 - Done: with `fake_pi`, `curl` photo and screenshot make files and a CSV line.
 
 ### K13 Dashboard shell
@@ -129,7 +158,7 @@ Order: A (base) then B (Pi) and C (PC) in parallel, then D. Tests T1-T21 are in 
 - Do: `bench_detector` loads a model folder and runs 100 frames, prints ONE JSON line: ms average and p95, RSS MB, CPU %, temperature, `vcgencmd get_throttled`. `--with-video` also reports the stream fps. `record_normal` saves 2 fps frames plus `pan,tilt,led` CSV (data for Stage B). `calib_encoders` drives 5 m, asks the measured distance, writes `cal_factor`. `calib_imu` 10 min still, drift report. `latency_test` command round trip.
 - Done: each runs in mock or says why not.
 
-### K17 Deploy
+### K17 Deploy (postponed until the 32 GB card arrives) [NEW v4.2]
 - Out: `tools/verify.py`, `tools/deploy_check.sh`, `docs/MIGRATION.md` (40 lines max).
 - Do: steps of 3.2. `verify.py` prints a PASS/FAIL table: services active, camera found, I2C 0x68, GPIO libraries, disk free over 20 %, `model/` valid (detector loads), ports, time sync, EEPROM `PSU_MAX_CURRENT`.
 - Done: runs on a PC and marks the Pi-only checks `SKIP`.
@@ -165,9 +194,12 @@ Order: A (base) then B (Pi) and C (PC) in parallel, then D. Tests T1-T21 are in 
 
 ## 3. DEVELOPMENT WORKFLOW [NEW]
 
-### 3.1 Now (16 GB card)
-- Pi OS **Lite** 64-bit (Bookworm). Everything lives in one GitHub repo. The PC side and the GPIO code are built with `HW_MODE=mock` and `tools/fake_pi.py`, so no robot is needed to test.
+### 3.1 Now (16 GB card) [v4.2 updated]
+- Pi OS **Lite** 64-bit (Bookworm). Everything lives in one GitHub repo. The PC side and the GPIO code are built with `HW_MODE=mock` and `tools/fake_pi.py`, so no robot is needed to test those parts.
 - AI: the friend trains on his side. Until the real files arrive the dummy detector runs. Nothing else changes when they arrive (section 6.4).
+- **Hardware in hand (21 Nov 2026):** Raspberry Pi 5 4 GB, USB camera, 16 GB SD card. **Not in hand:** the 32 GB card (on its way). Motors, drivers, sensors, servos, battery, IMU: not stated, treat as not wired until the user says so. So video (K00, K10) is tested for real now, and the controller (K04-K09) stays in mock mode until the parts are wired.
+- **16 GB card rules:** `rec_cap_gb: 3` in `config.yaml`. `model/` holds only the dummy ONNX file. No swap on the card. Keep 20 % free (K17 `verify.py` checks it). Nothing in this list is a reason to skip a task, except K17.
+- Rule: every change on the Pi goes through the repo (`setup.sh` or `config.yaml`), so the move to the 32 GB card in 3.2 stays a clone and a script.
 
 ### 3.2 Move to the 32 GB card
 1. Back up the 16 GB card as an image (Win32DiskImager, or `dd`). Keep it.
@@ -219,8 +251,8 @@ kashimo/
     web/        index.html css/{tokens,layout,components}.css js/{keys,link,whep,app,map,log}.js
   model/        (git-ignored) model.onnx bank.npy config.json model_card.md
   config/       config.yaml slabs.json
-  tools/        fake_pi.py ws_smoke.py bench_detector.py record_normal.py calib_*.py latency_test.py verify.py check_video.sh make_dummy_onnx.py
-  tests/  docs/  systemd/  runs/ (git-ignored)  setup.sh  requirements-{pi,pc}.txt  README.md
+  tools/        fake_pi.py ws_smoke.py bench_detector.py record_normal.py calib_*.py latency_test.py verify.py check_video.sh pi_probe.sh make_dummy_onnx.py
+  tests/  docs/ (design.md, PI_FIRST_BOOT.md, MIGRATION.md)  systemd/  runs/ (git-ignored)  setup.sh  requirements-{pi,pc}.txt  README.md
 ```
 
 ### 4.2 `config/config.yaml` keys
@@ -582,6 +614,17 @@ Front HC-SR04: stops forward at 30 cm, big dashboard number. Left, right: distan
 | T23 | Watchdog under AI load: AI at 100 % on 2 cores, link cut [NEW] | motors off within 0.5 s |
 | T24 | Water: 1-2 cm of water and a wet cable on the mock gallery: traction, sealing, front sensor, lens droplets, AI scores [NEW] | no leak, not stuck, AI behaviour recorded |
 | T25 | Coverage: from the centre line, does the head see both walls and the floor at readable detail (T8 sharpness) [NEW] | decides the driving line (5.7) |
+
+### 9.1 Which tests can run now [NEW v4.2]
+| Tests | Can run | Needs |
+|---|---|---|
+| T2, T8 (video delay, sharpness) | after K10, **on the real Pi + camera** | Pi, camera, Wi-Fi or Ethernet. Run T2 first without AI, repeat with AI on later |
+| T22 (temperature, throttling), first part | after K10, video only | active cooler fitted |
+| T13, T17, T18 (keys, photo, screenshot, key delay) | after K12-K14, with `fake_pi` on the PC | PC only |
+| T3, T23 (watchdog) | mock in K09 first, real Pi later | K09 |
+| T1 (AI on the Pi) | dummy now, **real number only with the friend's model** | K11, K16, model files |
+| T4, T15 (Wi-Fi at 30 m) | when the router is available | router, Pi on Wi-Fi |
+| T5-T7, T9-T12, T14, T16, T19-T21, T24, T25 | **later**, need the robot built | motors, sensors, chassis, battery |
 
 ---
 
