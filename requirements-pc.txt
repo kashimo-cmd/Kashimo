@@ -1,0 +1,8 @@
+fastapi>=0.110,<1
+uvicorn>=0.29,<1
+websockets>=12,<18
+opencv-python>=4.9,<6
+mss>=9,<11
+numpy>=1.26,<3
+PyYAML>=6,<7
+pytest>=8,<10

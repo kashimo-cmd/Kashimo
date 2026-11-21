@@ -1,0 +1,40 @@
+pi_ip: 127.0.0.1
+ws_port: 8765
+hw_mode: mock
+video:
+  mode: webrtc
+  whep_url: "http://{pi_ip}:8889/cam/whep"
+  rtsp_url: "rtsp://{pi_ip}:8554/cam"
+  mjpeg_url: "http://{pi_ip}:8765/video.mjpg"
+  w: 1280
+  h: 720
+  fps: 15
+  kbps: 2500
+rec_cap_gb: 8
+drive:
+  pwm_at_speed: 0.5
+  inner_ratio: 0.4
+  ramp_s: 0.3
+odo:
+  track_circumference_m: 0.15
+  counts_per_rev: 20
+  cal_factor: 1.0
+imu:
+  snap: false
+  snap_window_deg: 25
+  snap_straight_m: 1.0
+ai:
+  detector: dummy
+  model_dir: model
+  fps: 2
+  threads: 2
+  nice: 10
+  roi: [0, 0, 1280, 720]
+  pose_gate_deg: null
+  consecutive: 3
+  cooldown_s: 5
+gallery:
+  width_m: 2.0
+  length_m: 30
+  slab_width_m: 0.5
+slabs_file: config/slabs.json

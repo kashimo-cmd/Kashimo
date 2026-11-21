@@ -1,0 +1,18 @@
+name: Bug
+description: Something does not behave as docs/design.md says
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected (section of docs/design.md)
+  - type: textarea
+    id: steps
+    attributes:
+      label: How to reproduce (HW_MODE, command, test id)

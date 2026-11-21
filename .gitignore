@@ -1,31 +1,22 @@
-# Python cache
-__pycache__/
-*.py[cod]
-
-# Virtual environments
+model/
+runs/
+*.db
 venv/
 .venv/
-env/
-
-# Environment variables and secrets
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.onnx
+*.npy
+*.pt
+*.pth
 .env
 .env.*
 !.env.example
-
-# Logs
 *.log
-logs/
-
-# Temporary files
 *.tmp
 *.bak
 .DS_Store
 Thumbs.db
-
-# Generated recordings and captures
-recordings/
-captures/
-
-# IDE
 .vscode/
 .idea/
