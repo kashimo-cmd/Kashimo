@@ -1,0 +1,18 @@
+[Unit]
+Description=Kashimo AI worker (low priority)
+After=kashimo-controller.service kashimo-video.service
+Wants=kashimo-controller.service kashimo-video.service
+
+[Service]
+User=@USER@
+WorkingDirectory=@ROOT@
+Environment=OMP_NUM_THREADS=2
+Nice=10
+CPUQuota=200%
+MemoryMax=1500M
+ExecStart=@ROOT@/venv/bin/python -m pi.ai.worker
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

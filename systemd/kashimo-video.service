@@ -1,0 +1,15 @@
+[Unit]
+Description=Kashimo video pipeline (ffmpeg)
+After=kashimo-mediamtx.service
+Requires=kashimo-mediamtx.service
+
+[Service]
+User=@USER@
+SupplementaryGroups=video
+WorkingDirectory=@ROOT@
+ExecStart=@ROOT@/pi/video/pipeline.sh
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target
