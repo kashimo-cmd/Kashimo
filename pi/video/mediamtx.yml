@@ -1,1 +1,20 @@
-# stub: K10 (MediaMTX runs with its defaults until then)
+# K10: MediaMTX. Run from the repo root: mediamtx pi/video/mediamtx.yml  [CHECK key names against the installed version]
+logLevel: info
+rtsp: yes
+rtspAddress: :8554
+webrtc: yes
+webrtcAddress: :8889
+rtmp: no
+hls: no
+srt: no
+
+pathDefaults:
+  record: yes
+  recordPath: ./runs/rec/%path/%Y-%m-%d_%H-%M-%S-%f
+  recordFormat: fmp4
+  recordSegmentDuration: 60s
+  recordDeleteAfter: 0s
+
+paths:
+  cam:
+    source: publisher
