@@ -1,1 +1,15 @@
-/* stub: K13 */
+/* K13 tokens, design 7.3. Nothing else in the CSS may use a raw colour, size or spacing value. */
+:root {
+  color-scheme: dark;
+  --bg: #121518; --surface: #1A1E22; --surface-2: #22272C; --border: #323840;
+  --text: #E8EBEE; --text-2: #A3ADB7; --accent: #4FA3E0;
+  --ok: #46C28B; --warn: #E9A93B; --err: #F2594C;
+  --font: system-ui, "Segoe UI", sans-serif;
+  --mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --fs-label: 12px; --fs-body: 14px; --fs-value: 16px; --fs-title: 20px; --fs-big: 48px;
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px;
+  --r-panel: 2px; --r-ctl: 4px;
+  --t-state: 120ms;
+  --touch: 40px;
+}
+@media (prefers-reduced-motion: reduce) { :root { --t-state: 0ms; } }
