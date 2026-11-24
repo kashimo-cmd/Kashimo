@@ -1,5 +1,85 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><title>KASHIMO</title></head>
-<body>stub: K13</body>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kashimo</title>
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+</head>
+<body data-conn="connecting">
+<div class="app">
+  <header class="head">
+    <h1>KASHIMO</h1>
+    <div class="chips">
+      <span class="chip label">State <b id="h-state">--</b></span>
+      <span class="chip label">LED <b id="h-led">--</b></span>
+      <span class="chip label">Rod <b id="h-rod">--</b></span>
+      <span class="chip label">AI <b id="h-ai">--</b></span>
+      <span class="chip label">Pi <b id="h-conn">Connecting</b></span>
+    </div>
+    <span id="demo-flag" role="status">SAMPLE DATA: not live</span>
+    <button class="stop" id="btn-stop" data-code="Space" disabled><kbd>Space</kbd><span>STOP</span></button>
+  </header>
+
+  <ul class="banners" id="banners" role="alert" aria-live="assertive"></ul>
+
+  <main class="video" id="video" data-state="none" aria-label="Live video">
+    <p class="msg" id="video-msg">No video yet. The stream starts when the Pi is connected.</p>
+  </main>
+
+  <aside class="side" aria-label="Robot readouts">
+    <section class="row" id="obstacle" aria-label="Obstacle ahead">
+      <div class="pair"><span class="label">Obstacle ahead</span><span class="label stale-tag">stale</span><span class="label lv" id="front-label" data-level="">--</span></div>
+      <div class="pair"><span class="big" id="front">--<small>cm</small></span>
+        <span class="num dim">L <span id="fl">--</span> &nbsp;R <span id="fr">--</span></span></div>
+    </section>
+    <section class="row" aria-label="Link">
+      <div class="pair"><span class="label">Link</span><span class="bars" id="bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span class="num"><span id="dbm">--</span> dBm</span></div>
+      <div class="pair"><span class="label">Delay / loss</span><span class="num"><span id="rtt">--</span> ms &nbsp;<span id="loss">--</span> %</span></div>
+    </section>
+    <section class="row" aria-label="Position and attitude">
+      <div class="pair"><span class="label">Pan / tilt</span><span class="num"><span id="pan">--</span> / <span id="tilt">--</span></span></div>
+      <div class="pair"><span class="label">Slab / path</span><span class="num"><span id="slab">--</span> &nbsp;<span id="s">--</span> m</span></div>
+      <div class="pair"><span class="label">Pitch / roll</span><span class="num"><span id="pitch">--</span> / <span id="roll">--</span></span></div>
+    </section>
+    <section class="row map" aria-label="Map">
+      <span class="label">Map (top view)</span>
+      <div class="empty" id="map">The path map is built in task K15.</div>
+    </section>
+  </aside>
+
+  <section class="log" aria-label="Alerts and log">
+    <h2 class="label">Alerts / log (latest first)</h2>
+    <div class="scroll"><table>
+      <thead><tr><th>Time</th><th>Slab</th><th>Event</th></tr></thead>
+      <tbody id="log-body"><tr class="empty-row"><td colspan="3">No alerts or events yet. Defects, obstacles and link changes appear here.</td></tr></tbody>
+    </table></div>
+  </section>
+
+  <section class="actions" aria-label="Capture">
+    <button id="btn-photo" data-code="Enter" disabled><kbd>Enter</kbd>Photo</button>
+    <button id="btn-shot" data-code="KeyP" disabled><kbd>P</kbd>Screenshot</button>
+    <div id="action-msg" role="status" aria-live="polite"></div>
+  </section>
+
+  <nav class="keybar" aria-label="Controls">
+    <div class="kgroup"><span class="label">Drive</span>
+      <button data-code="KeyW" aria-label="Forward (Z)" disabled><kbd>Z</kbd></button>
+      <button data-code="KeyA" aria-label="Left (Q)" disabled><kbd>Q</kbd></button>
+      <button data-code="KeyS" aria-label="Backward (S)" disabled><kbd>S</kbd></button>
+      <button data-code="KeyD" aria-label="Right (D)" disabled><kbd>D</kbd></button></div>
+    <div class="kgroup"><span class="label">Head</span>
+      <button data-code="ArrowLeft" aria-label="Head left" disabled><kbd>&larr;</kbd></button>
+      <button data-code="ArrowRight" aria-label="Head right" disabled><kbd>&rarr;</kbd></button>
+      <button data-code="ArrowUp" aria-label="Head up" disabled><kbd>&uarr;</kbd></button>
+      <button data-code="ArrowDown" aria-label="Head down" disabled><kbd>&darr;</kbd></button></div>
+    <button data-code="KeyH" disabled><kbd>H</kbd>Centre head</button>
+    <button data-code="KeyL" disabled><kbd>L</kbd>LED</button>
+    <button data-code="KeyR" disabled><kbd>R</kbd>Rod (hold 1 s)</button>
+  </nav>
+</div>
+<script src="js/demo.js"></script>
+</body>
 </html>
