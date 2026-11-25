@@ -3,7 +3,7 @@
   const BARS = [-60, -70, -80];
   const $ = (id) => document.getElementById(id);
   const num = (v, d) => (v === null || v === undefined ? "--" : Number(v).toFixed(d));
-  const lvl = (el, l) => el.parentElement.setAttribute("data-level", l);
+  const lvl = (el, l) => (l ? el.parentElement.setAttribute("data-level", l) : el.parentElement.removeAttribute("data-level"));
 
   const BASE = { conn: "connected", silent_ms: 0, t: {
     state: "MANUAL", latch: false, fc: 87, fl: 110, fr: 118, s: 12.4, slab: 25, pan: 90, tilt: 90, led: true,
@@ -24,11 +24,12 @@
     "rod-moving": patch({ rod: "LIFTING" }, {}),
   };
 
-  function banners(t, silent, conn) {
+  function banners(t, silent, conn, why) {
     const b = [];
-    if (conn !== "connected") b.push(["err", "Pi disconnected: values are stale, controls disabled."]);
-    if (t.state === "LINK_LOST") b.push(["err", "LINK LOST: motors off. Press Space after the link returns."]);
-    else if (silent >= 300 && silent < 500) b.push(["warn", "Link about to cut: no message for 300 ms."]);
+    if (conn === "connecting") return [["info", "Connecting: waiting for the first data from the Pi."]];
+    if (conn === "disconnected") return [["err", (why === "server" ? "Dashboard server" : "Pi") + " disconnected: values are stale, controls disabled."]];
+    if (t.state === "LINK_LOST" || silent >= 500) b.push(["err", "LINK LOST: motors off. Press Space after the link returns."]);
+    else if (silent >= 300) b.push(["warn", "Link about to cut: no message for 300 ms."]);
     if (t.latch && t.state !== "LINK_LOST") b.push(["warn", "STOP latched: drive refused. Press Space to release."]);
     if (t.fc !== null && t.fc < 30) b.push(["err", "Front obstacle under 30 cm: forward refused. S, Q and D still work."]);
     const tilt = Math.max(Math.abs(t.pitch), Math.abs(t.roll));
@@ -40,17 +41,19 @@
     if (t.led === false) b.push(["info", "LED OFF: image dark, AI paused."]);
     if (t.ai === "DUMMY") b.push(["info", "AI: TEST DETECTOR, scores are not real."]);
     if (t.ai === "NO_MODEL") b.push(["info", "AI: no model loaded."]);
+    if (t.refusal && !/front obstacle|STOP latched|IMU calibrating|rod moving/.test(t.refusal)) b.push(["warn", "Refused: " + t.refusal + "."]);
     return b;
   }
 
   function render(d) {
     const t = d.t, conn = d.conn, on = conn === "connected";
     document.body.setAttribute("data-conn", conn);
+    document.body.toggleAttribute("data-nodata", t.state === "--");  // placeholder values are not stale values
     const chip = (id, text, level) => { $(id).textContent = text; lvl($(id), level); };
     chip("h-state", t.state, { MANUAL: "ok", STOPPED: "warn", LINK_LOST: "err" }[t.state]);
-    chip("h-led", t.led ? "ON" : "OFF", t.led ? "ok" : "warn");
-    chip("h-rod", t.rod, t.rod === "LIFTING" || t.rod === "FOLDING" ? "warn" : "ok");
-    chip("h-ai", t.ai === "DUMMY" ? "TEST DETECTOR" : t.ai, t.ai === "RUNNING" ? "ok" : "warn");
+    chip("h-led", t.led === null ? "--" : t.led ? "ON" : "OFF", t.led === null ? "" : t.led ? "ok" : "warn");
+    chip("h-rod", t.rod, t.rod === "--" ? "" : t.rod === "LIFTING" || t.rod === "FOLDING" ? "warn" : "ok");
+    chip("h-ai", t.ai === "DUMMY" ? "TEST DETECTOR" : t.ai, t.ai === "--" ? "" : t.ai === "RUNNING" ? "ok" : "warn");
     chip("h-conn", on ? "Connected" : conn === "connecting" ? "Connecting" : "Disconnected", on ? "ok" : "err");
     const fc = t.fc, col = fc === null ? "none" : fc < 30 ? "red" : fc > 60 ? "green" : "orange";
     $("obstacle").setAttribute("data-color", col);
@@ -58,20 +61,25 @@
     const fl = $("front-label"); fl.textContent = { none: "NO ECHO", green: "CLEAR", orange: "CAUTION", red: "STOP" }[col];
     fl.setAttribute("data-level", { none: "", green: "ok", orange: "warn", red: "err" }[col]);
     $("fl").textContent = num(t.fl, 0); $("fr").textContent = num(t.fr, 0);
-    const bars = t.rssi_dbm >= BARS[0] ? 4 : t.rssi_dbm >= BARS[1] ? 3 : t.rssi_dbm >= BARS[2] ? 2 : 1;
+    const bars = t.rssi_dbm === null ? 0 : t.rssi_dbm >= BARS[0] ? 4 : t.rssi_dbm >= BARS[1] ? 3 : t.rssi_dbm >= BARS[2] ? 2 : 1;
     [...$("bars").children].forEach((el, i) => el.classList.toggle("on", i < bars));
     $("dbm").textContent = num(t.rssi_dbm, 0);
     $("rtt").textContent = num(d.link.rtt_ms, 0); $("loss").textContent = num(d.link.loss_pct, 0);
     $("rtt").classList.toggle("warnval", d.link.rtt_ms > 200); $("loss").classList.toggle("warnval", d.link.loss_pct > 5);
     ["pan", "tilt", "slab", "pitch", "roll"].forEach((k) => ($(k).textContent = num(t[k], 0)));
     $("s").textContent = num(t.s, 1);
-    const ul = $("banners"); ul.replaceChildren();
-    banners(t, d.silent_ms, conn).forEach(([l, text]) => { const li = document.createElement("li"); li.className = "banner"; li.setAttribute("data-level", l); li.textContent = text; ul.appendChild(li); });
+    const list = banners(t, d.silent_ms, conn, d.why), key = JSON.stringify(list), ul = $("banners");
+    if (ul.getAttribute("data-key") !== key) {  // rebuilt only on change: the alert region must not re-announce every 100 ms
+      ul.setAttribute("data-key", key); ul.replaceChildren();
+      list.forEach(([l, text]) => { const li = document.createElement("li"); li.className = "banner"; li.setAttribute("data-level", l); li.textContent = text; ul.appendChild(li); });
+    }
     const stop = $("btn-stop"); stop.querySelector("span").textContent = t.latch ? "RELEASE" : "STOP";
     stop.toggleAttribute("data-latched", t.latch);
     document.querySelectorAll("button[data-code]").forEach((b) => (b.disabled = !on));
-    $("video").setAttribute("data-state", "none");
-    $("video-msg").textContent = on ? "Sample view: no video in demo mode." : "No video: the Pi is disconnected.";
+    if (document.body.hasAttribute("data-demo")) {
+      $("video").setAttribute("data-state", "none");
+      $("video-msg").textContent = on ? "Sample view: no video in demo mode." : "No video: the Pi is disconnected.";
+    }
   }
 
   function sampleLog() {
@@ -85,6 +93,7 @@
   if (name !== null) {
     document.body.setAttribute("data-demo", name);
     render(FIXTURES[name] || FIXTURES.connected);
+    document.querySelectorAll("button[data-code]").forEach((b) => { b.disabled = true; b.title = "Sample data: controls are off"; });
     sampleLog();
     if (!FIXTURES[name]) console.warn("unknown demo state:", name, "known:", Object.keys(FIXTURES).join(", "));
   }
