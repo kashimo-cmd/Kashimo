@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: "If you use this work, please cite it as below."
+title: "Kashimo: tracked robot for safe inspection of live cable galleries"
+type: software
+authors:
+  - name: "Kashimo team (IAS Challenge TSYP14)"
+repository-code: "https://github.com/kashimo-cmd/Kashimo"
+license: MIT
+version: 0.1.0
+date-released: 2026-11-25
+abstract: "Prototype software for a tracked inspection robot for an ACTIA cable gallery: Raspberry Pi 5 controller and video, PC web dashboard, AI plug-in. Hardware and AI are not yet validated."
+keywords:
+  - robotics
+  - inspection
+  - cable gallery
+  - Raspberry Pi
