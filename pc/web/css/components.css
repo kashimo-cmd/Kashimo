@@ -97,3 +97,59 @@ button[data-pressed] .ring-fg { stroke: var(--bg); }
 #action-msg[data-level="ok"]::before { content: "\25CF  "; }
 #action-msg[data-level="warn"]::before { content: "\25B2  "; }
 #action-msg[data-level="err"]::before { content: "\25A0  "; }
+
+/* K15: map, log rows, picture viewer. Shape + text with every colour (7.3). */
+.mapbox { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: var(--s1); }
+.map-badges { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0 var(--s3); }
+.map-badges:empty { display: none; }
+.map-badge { font-size: var(--fs-label); letter-spacing: .08em; font-weight: 600; white-space: nowrap; }
+.map-badge::before { margin-right: var(--s1); }
+.map-badge[data-level="warn"] { color: var(--warn); } .map-badge[data-level="warn"]::before { content: "\25B2"; }
+.map-badge[data-level="err"] { color: var(--err); } .map-badge[data-level="err"]::before { content: "\25A0"; }
+.map-view { position: relative; flex: 1 1 0; min-height: 48px; border: 1px solid var(--border); border-radius: var(--r-panel); overflow: hidden; }
+.map-svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.map-empty { position: absolute; inset: 0; margin: 0; display: grid; place-items: center; text-align: center; padding: var(--s2); color: var(--text-2); }
+.map-view[data-has="1"] .map-empty { display: none; }
+.map-stats { display: flex; justify-content: space-between; gap: var(--s3); flex-wrap: wrap; }
+.map-legend { display: flex; flex-wrap: wrap; gap: 0 var(--s3); }
+.map-legend i { font-style: normal; margin-right: var(--s1); }
+.map-legend [data-pin="photo"] i { color: var(--accent); } .map-legend [data-pin="alert"] i { color: var(--warn); }
+.map-legend [data-pin="obstacle"] i { color: var(--err); } .map-legend [data-pin="bump"] i { color: var(--text-2); }
+.m-gallery { fill: var(--surface); stroke: var(--border); stroke-width: 1; }
+.m-tick { stroke: var(--text-2); stroke-width: 1; }
+.m-text { fill: var(--text-2); font: var(--fs-label) var(--mono); text-anchor: middle; }
+.m-text.start { text-anchor: start; }
+.m-hole { stroke: var(--accent); stroke-width: 1; }
+.m-path { fill: none; stroke: var(--text-2); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.m-robot { fill: var(--text); stroke: var(--bg); stroke-width: 1; }
+[data-conn="disconnected"] .m-robot, [data-conn="connecting"] .m-robot { fill: none; stroke: var(--text-2); stroke-width: 2; }
+.m-pin { cursor: pointer; outline: none; }
+.m-pin .hit { fill: transparent; }
+.m-pin .m-ring { fill: none; stroke: none; stroke-width: 2; }
+.m-pin[data-selected] .m-ring { stroke: var(--text); }
+.m-pin:focus-visible .m-ring { stroke: var(--accent); }
+.m-pin .m-shape { stroke: var(--bg); stroke-width: 1; }
+.m-pin[data-kind="photo"] .m-shape { fill: var(--accent); } .m-pin[data-kind="alert"] .m-shape { fill: var(--warn); }
+.m-pin[data-kind="obstacle"] .m-shape { fill: var(--err); } .m-pin[data-kind="bump"] .m-shape { fill: var(--text-2); }
+.log tbody tr[data-key] { cursor: pointer; }
+.log tbody tr[data-key]:hover { background: var(--surface); }
+.log tbody tr[data-selected] { background: var(--surface-2); }
+.log tbody tr[data-selected] td:first-child { border-left: 2px solid var(--accent); }
+.log tbody tr[data-key]:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+td.ev::before { margin-right: var(--s2); }
+td.ev[data-mark="photo"]::before { content: "\25CF"; color: var(--accent); }
+td.ev[data-mark="alert"]::before { content: "\25B2"; color: var(--warn); }
+td.ev[data-mark="obstacle"]::before, td.ev[data-mark="link-lost"]::before { content: "\25A0"; color: var(--err); }
+td.ev[data-mark="bump"]::before { content: "\25C6"; color: var(--text-2); }
+td.ev[data-mark="link-back"]::before { content: "\25CF"; color: var(--ok); }
+.pic { font-size: var(--fs-label); letter-spacing: .08em; text-transform: uppercase; color: var(--text-2); margin-left: var(--s2); }
+dialog#viewer { background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: var(--r-panel); padding: 0; width: min(96vw, 1100px); max-height: 92dvh; }
+dialog#viewer::backdrop { background: var(--bg); opacity: .85; }
+.viewer-head { display: flex; justify-content: space-between; align-items: center; gap: var(--s3); padding: var(--s2) var(--s3); border-bottom: 1px solid var(--border); }
+.viewer-head h2 { margin: 0; font-size: var(--fs-value); font-weight: 600; }
+.viewer-body { display: flex; flex-wrap: wrap; gap: var(--s3); padding: var(--s3); overflow: auto; max-height: calc(92dvh - 112px); }
+.viewer-body figure { margin: 0; flex: 1 1 320px; min-width: 0; }
+.viewer-body figcaption { margin-bottom: var(--s1); }
+.viewer-body img { width: 100%; height: auto; display: block; border: 1px solid var(--border); }
+.viewer-meta { margin: 0; padding: 0 var(--s3) var(--s3); }
+.log tbody tr { scroll-margin-top: calc(var(--s5) + var(--s1)); }  /* the sticky header must not cover a row that scrolls into view */

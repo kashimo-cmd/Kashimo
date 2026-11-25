@@ -34,6 +34,7 @@
       const r = await fetch("/api/" + kind, { method: "POST", signal: ctl.signal });
       const b = await r.json().catch(() => ({}));
       if (r.ok && b.ok) {
+        if (kind === "photo") document.dispatchEvent(new CustomEvent("kashimo-photo", { detail: { n: b.n, file: b.file, slab: b.slab, ts: Date.now() / 1000, x: cur && cur.t ? cur.t.x : null, y: cur && cur.t ? cur.t.y : null, s: cur && cur.t ? cur.t.s : null } }));  // K15 pin: position from the last telemetry shown
         const slab = Number.isInteger(b.slab) ? " (slab " + String(b.slab).padStart(2, "0") + ")" : "";
         flash("Saved: " + LABEL[kind].toLowerCase() + " " + b.n + ", " + String(b.file).split("/").pop() + slab, "ok");
       } else flash("Failed: " + LABEL[kind].toLowerCase() + " not saved. " + (b.error || "server answered " + r.status), "err");
@@ -66,6 +67,7 @@
     if (wasOn && !on) kb.releaseAll();
     wasOn = on;
     view.render(Object.assign({}, cur, { t: cur.t || EMPTY }));
+    document.dispatchEvent(new CustomEvent("kashimo-telemetry", { detail: cur }));  // K15 map
   }
 
   async function startVideo() {
@@ -73,6 +75,7 @@
       try {
         const st = await (await fetch("/api/status")).json();
         const v = st.video || {};
+        document.dispatchEvent(new CustomEvent("kashimo-config", { detail: st }));  // K15: gallery size, run folder
         const mode = params.get("video") || v.mode;
         const vid = V.create({
           mode, whep: v.whep_url, mjpeg: v.mjpeg_url, video: $("cam"), img: $("cam-img"),

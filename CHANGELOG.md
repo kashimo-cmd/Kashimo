@@ -4,6 +4,7 @@ Format: [Keep a Changelog](https://keepachangelog.com). Versions are Git tags.
 
 ## [Unreleased]
 ### Added
+- K15 dashboard map (path, slab ticks, pins, distance to the hole) and alert log with picture viewer.
 - Documentation set: ARCHITECTURE, USER_MANUAL, TASKS, TESTING, IMPACT, phase 2 notes, REPO_GUIDE_FOR_AI.
 - `hardware/` (BOM, pin map, power), `results/` (empty result log and test report template), `ai/`, `media/`.
 - CHANGELOG.md, CITATION.cff.

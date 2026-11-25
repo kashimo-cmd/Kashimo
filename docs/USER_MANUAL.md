@@ -45,7 +45,7 @@ Every key also has an on-screen button.
 | `--` with no strike-through | No data received yet | Wait |
 
 ## 6. Run procedure [ROBOT LATER]
-Rod up (R), drive with Z/S/Q/D, aim the head, photograph suspect spots (Enter). An AI alert (3 flagged frames in a row) shows frame and heatmap: you decide. At the end drive back, fold the rod (R), lift the robot out. The report is the defect log, photos and screenshots.
+Rod up (R), drive with Z/S/Q/D, aim the head, photograph suspect spots (Enter). An AI alert (3 flagged frames in a row) shows frame and heatmap: you decide. Pins on the map and lines in the log open the picture (click, touch, or V on a focused pin or row). At the end drive back, fold the rod (R), lift the robot out. The report is the defect log, photos and screenshots.
 
 ## 7. Troubleshooting
 | Problem | Check |
