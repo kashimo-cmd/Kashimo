@@ -60,6 +60,9 @@ button[data-pressed] kbd { border-color: var(--bg); }
 [data-conn="disconnected"] .side, [data-conn="connecting"] .side { opacity: .7; }
 .stale-tag { display: none; color: var(--warn); }
 [data-conn="disconnected"] .stale-tag, [data-conn="connecting"] .stale-tag { display: inline; }
+/* no data yet (placeholders "--"): nothing is stale, so no strike-through and no STALE tag */
+[data-nodata] .side .num, [data-nodata] .side .big { text-decoration: none; }
+[data-nodata] .stale-tag { display: none; }
 
 /* log */
 .log h2, .actions h2 { margin: 0; padding: var(--s2) var(--s3); font-weight: 400; }
@@ -75,3 +78,22 @@ td { padding: var(--s1) var(--s3); border-bottom: 1px solid var(--border); white
 .kgroup .label { margin-right: var(--s1); }
 .keybar button { padding: 0 var(--s2); min-width: var(--touch); }
 @media (max-width: 899px) { .keybar { gap: var(--s3); } .kgroup { flex-wrap: wrap; } }
+
+/* K14: video source states, R-hold ring, capture messages, touch keys */
+.video[data-state="none"] video, .video[data-state="none"] img { display: none; }
+.video .tag { background: var(--surface); padding: 0 var(--s2); border-radius: var(--r-ctl); z-index: 1; }
+button[data-code] { touch-action: none; user-select: none; -webkit-user-select: none; }
+.ring { display: none; width: var(--s4); height: var(--s4); margin-left: var(--s2); transform: rotate(-90deg); vertical-align: middle; }
+.ring circle { fill: none; stroke-width: 1.5; }
+.ring-bg { stroke: var(--border); }
+.ring-fg { stroke: var(--accent); stroke-dasharray: 100; stroke-dashoffset: calc(100 * (1 - var(--hold, 0))); }
+button[data-holding] .ring { display: inline-block; }
+button[data-pressed] .ring-bg { stroke: var(--text-2); }
+button[data-pressed] .ring-fg { stroke: var(--bg); }
+#action-msg { overflow-wrap: anywhere; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; }
+#action-msg[data-level="ok"] { color: var(--ok); }
+#action-msg[data-level="warn"] { color: var(--warn); }
+#action-msg[data-level="err"] { color: var(--err); }
+#action-msg[data-level="ok"]::before { content: "\25CF  "; }
+#action-msg[data-level="warn"]::before { content: "\25B2  "; }
+#action-msg[data-level="err"]::before { content: "\25A0  "; }

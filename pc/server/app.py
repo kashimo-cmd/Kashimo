@@ -38,7 +38,10 @@ def settings(cfg, pi_ip=None, video="auto", runs=None):
     v, base = cfg.get("video", {}), f"{ip}:{cfg.get('ws_port', C.WS_PORT)}"
     rtsp, mjpeg = ((v.get(k) or "").format(pi_ip=ip) for k in ("rtsp_url", "mjpeg_url"))
     url = {"rtsp": rtsp, "mjpeg": mjpeg}.get(video, rtsp or mjpeg)
-    return dict(ws_url=f"ws://{base}/ws", http=f"http://{base}", video_url=url, runs=Path(runs or ROOT / "runs"))
+    whep = (v.get("whep_url") or f"http://{{pi_ip}}:{C.WHEP_PORT}/cam/whep").format(pi_ip=ip)
+    mode = {"mjpeg": "mjpeg", "rtsp": "webrtc"}.get(video, v.get("mode") or "webrtc")  # what the dashboard page plays
+    return dict(ws_url=f"ws://{base}/ws", http=f"http://{base}", video_url=url, runs=Path(runs or ROOT / "runs"),
+                video=dict(mode=mode, whep_url=whep, mjpeg_url=mjpeg))
 
 
 class LinkStats:
@@ -250,7 +253,7 @@ def make_app(cfg=None, pi_ip=None, video="auto", runs=None):
     @app.get("/api/status")
     def api_status():
         return {"pi": st.pi_ws is not None, "run": st.run.path.name, "events": len(st.events),
-                "photos": st.n_photo, "screenshots": st.n_shot, "video_url": st.set["video_url"]}
+                "photos": st.n_photo, "screenshots": st.n_shot, "video_url": st.set["video_url"], "video": st.set["video"]}
 
     @app.get("/alerts/{name}")
     async def alert(name: str):
