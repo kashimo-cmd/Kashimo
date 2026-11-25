@@ -20,3 +20,7 @@ __pycache__/
 Thumbs.db
 .vscode/
 .idea/
+
+# stray output files (keep them outside the repo)
+/files.txt
+/log.txt

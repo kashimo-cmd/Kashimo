@@ -2,35 +2,35 @@
 
 [![CI](https://github.com/kashimo-cmd/Kashimo/actions/workflows/ci.yml/badge.svg)](https://github.com/kashimo-cmd/Kashimo/actions/workflows/ci.yml)
 
-Tracked inspection robot for the ACTIA cable gallery (IAS Challenge TSYP14, phase 2).
-A Raspberry Pi 5 drives, streams video and runs the AI. The operator works from a web dashboard on a PC.
+Tracked robot for safe inspection of live cable galleries (IEEE IAS Challenge TSYP14, partner ACTIA). A Raspberry Pi 5 drives, streams video and runs the AI. One operator works from a web dashboard on a PC.
+Problem: the gallery is 30+ m long, cables are live up to 380 V, and two or more technicians crawl in to search a fault (about 2 h, ACTIA estimate). Details: [docs/phase2](docs/phase2/README.md).
 
-**Status:** K01-K03 (skeleton, protocol, fake Pi), K00 and K10 (Pi first boot, video pipeline) and K12 (PC server) are done. K10 is not yet run on the real Pi. Next: K13-K15 (dashboard).
-Design, contracts, tasks K01-K17 and tests T1-T25: [docs/design.md](docs/design.md).
+**Status (25 Nov 2026):** PC software (protocol, fake Pi, server, dashboard to K14) and Pi controller parts K04-K08 are done and tested on a PC only. K09, K11, K15-K17 are not merged. Nothing is run on the real Pi or robot, and there are no measured results yet. Per-task status: [docs/TASKS.md](docs/TASKS.md).
+
+## Docs
+[Index](docs/README.md) · [Design and contracts](docs/design.md) · [Architecture](docs/ARCHITECTURE.md) · [User manual](docs/USER_MANUAL.md) · [Testing](docs/TESTING.md) · [Hardware](hardware/README.md) · [Results](results/README.md) · [AI guide for assistants](docs/REPO_GUIDE_FOR_AI.md)
 
 ## Run in mock mode (PC, no robot)
-Python 3.11.
+Python 3.11 or newer.
 ```
 python -m venv venv
 venv\Scripts\activate        (Linux/macOS: source venv/bin/activate)
 pip install -r requirements-pc.txt
 python -m pytest
 ```
-Fake Pi and PC server: `python tools/fake_pi.py --no-webcam`, then `python -m pc.server.app --video mjpeg` (the dashboard page comes with K13-K14). Code reads `HW_MODE=mock`.
+Terminal 1: `python tools/fake_pi.py --no-webcam`. Terminal 2: `python -m pc.server.app --video mjpeg`. Browser: http://127.0.0.1:8080. Code reads `HW_MODE=mock`.
 
 ## Run on the Pi
-Raspberry Pi OS Lite 64-bit, **Bookworm** (Python 3.11). In Raspberry Pi Imager choose Raspberry Pi OS (other), Legacy 64-bit Lite. The current default image is Trixie (Python 3.13) and `setup.sh` refuses it.
+Raspberry Pi OS Lite 64-bit **Bookworm** (Python 3.11): in Imager choose Raspberry Pi OS (other), Legacy 64-bit Lite. `setup.sh` refuses Trixie.
 ```
 git clone https://github.com/kashimo-cmd/Kashimo.git ~/kashimo
 cd ~/kashimo && bash setup.sh
 ```
-`model/` is not in Git: copy it with `scp`. Check the install with `python tools/verify.py` (K17).
+`model/` is not in Git: copy it with `scp`. First boot: [docs/PI_FIRST_BOOT.md](docs/PI_FIRST_BOOT.md).
 
 ## Layout
-`common/` protocol, `pi/` robot code, `pc/` server and dashboard, `config/`, `tools/`, `tests/`, `systemd/`, `docs/`.
+`common/` `pi/` `pc/` `config/` `tools/` `tests/` `systemd/` code · `hardware/` `simulation/` `results/` `media/` `ai/` `docs/` evidence and documentation.
 
-## Safety
-Live cables (up to 380 V) and water mean a shock risk. Read section 8.5 of docs/design.md before any test with the robot.
-
-## Contributing and license
-Branch and pull request rules: [CONTRIBUTING.md](CONTRIBUTING.md). Code under the [MIT license](LICENSE).
+## Safety, contributing, license
+Live cables and water mean a shock risk: read section 8.5 of [docs/design.md](docs/design.md) before any robot test. Nothing is certified.
+[CONTRIBUTING.md](CONTRIBUTING.md) · [MIT license](LICENSE) · [CITATION.cff](CITATION.cff) · [CHANGELOG.md](CHANGELOG.md)

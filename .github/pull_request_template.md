@@ -1,5 +1,5 @@
 ## Task
-Closes #
+Task: K__ (no issue number needed)
 
 ## What changed
 -

@@ -1,6 +1,7 @@
 # Contributing
 
 `docs/design.md` is the single source of truth. Read its section 0 before writing code.
+An AI assistant must also follow [docs/REPO_GUIDE_FOR_AI.md](docs/REPO_GUIDE_FOR_AI.md) (file layout, exact Git commands, truth rules). Conduct: [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
 
 ## Rules
 - `main` is protected. Nobody pushes to it: every change is a pull request.
