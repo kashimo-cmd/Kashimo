@@ -13,7 +13,7 @@ Status is what `main` contains on 25 Nov 2026 (after PR #14). IN PROGRESS = done
 | K12 | PC server | DONE | `pc/server/`, `tests/test_server.py` | n/a |
 | K13 | Dashboard shell | DONE | `pc/web/` | n/a |
 | K14 | Dashboard logic | DONE | `pc/web/js/`, `docs/tasks/K14.md`, `tests/*.mjs` | no real Pi, no AZERTY test (T13) |
-| K15 | Map and log panel | IN PROGRESS, not merged | `pc/web/js/map.js`, `log.js` (1 line each) | no |
+| K15 | Map and log panel | DONE | `pc/web/js/map.js`, `log.js`, `docs/tasks/K15.md`, `tests/map.test.mjs`, `tests/log.test.mjs` | no real Pi, no gallery turn, no Edge or Firefox |
 | K04 | Hardware layer | DONE (PC, fake HW) | `pi/controller/hw.py`, `tests/test_hw.py`, `docs/tasks/K04.md` | **NOT RUN** |
 | K05 | Sensors | DONE (PC, fake HW) | `sensors.py`, `tests/test_sensors.py`, `docs/tasks/K05.md` | **NOT RUN** |
 | K06 | Drive | DONE (PC, fake HW) | `drive.py`, `tests/test_drive.py`, `docs/tasks/K06.md` | **NOT RUN** |

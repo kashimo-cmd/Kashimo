@@ -23,7 +23,7 @@ flowchart LR
 ```
 | Block | Role | Status |
 |---|---|---|
-| `pc/web` | Dashboard: keys, readouts, banners, video, photo, screenshot | [BUILT] K13, K14. Map and log panel [STUB on main] K15 in progress |
+| `pc/web` | Dashboard: keys, readouts, banners, video, photo, screenshot | [BUILT] K13, K14. Map and log panel [BUILT] K15 |
 | `pc/server` | Serves the page, relays WebSocket, saves photos, screenshots, CSV | [BUILT] K12 |
 | `common/` | Message validation, constants, key map shared by PC and Pi | [BUILT] K02 |
 | `pi/video` | One ffmpeg: H.264 to MediaMTX, 2 fps JPEG for the AI, 60 s recording segments | [BUILT] K10, never run on the Pi |

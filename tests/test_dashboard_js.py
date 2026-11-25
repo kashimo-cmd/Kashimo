@@ -16,7 +16,7 @@ needs_node = pytest.mark.skipif(NODE is None, reason="node is not installed")
 
 @needs_node
 def test_js_unit_tests():
-    run = subprocess.run([NODE, "--test", "tests/keys.test.mjs", "tests/link.test.mjs"], cwd=ROOT, capture_output=True, text=True, timeout=60)
+    run = subprocess.run([NODE, "--test", "tests/keys.test.mjs", "tests/link.test.mjs", "tests/map.test.mjs", "tests/log.test.mjs"], cwd=ROOT, capture_output=True, text=True, timeout=60)
     assert run.returncode == 0, run.stdout + run.stderr
 
 
@@ -37,3 +37,9 @@ def test_status_video_config():
     assert A.settings(cfg, video="mjpeg")["video"]["mode"] == "mjpeg"  # fake_pi has no WebRTC
     assert A.settings(dict(cfg, video=dict(cfg["video"], mode="mjpeg")), video="rtsp")["video"]["mode"] == "webrtc"
     assert A.settings({"pi_ip": "1.2.3.4"})["video"] == {"mode": "webrtc", "whep_url": "http://1.2.3.4:8889/cam/whep", "mjpeg_url": ""}
+
+
+def test_status_gallery_for_the_map():
+    cfg = {"pi_ip": "1.2.3.4", "gallery": {"width_m": 2.5, "length_m": 12, "slab_width_m": 0.5}}
+    assert A.settings(cfg)["gallery"] == {"width_m": 2.5, "length_m": 12, "slab_width_m": 0.5}
+    assert A.settings({"pi_ip": "1.2.3.4"})["gallery"] == {"width_m": 2.0, "length_m": 30, "slab_width_m": 0.5}

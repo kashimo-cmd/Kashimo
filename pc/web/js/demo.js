@@ -6,7 +6,7 @@
   const lvl = (el, l) => (l ? el.parentElement.setAttribute("data-level", l) : el.parentElement.removeAttribute("data-level"));
 
   const BASE = { conn: "connected", silent_ms: 0, t: {
-    state: "MANUAL", latch: false, fc: 87, fl: 110, fr: 118, s: 12.4, slab: 25, pan: 90, tilt: 90, led: true,
+    state: "MANUAL", latch: false, fc: 87, fl: 110, fr: 118, s: 12.4, x: 12.2, y: 0.2, yaw: 0.03, slab: 25, pan: 90, tilt: 90, led: true,
     rod: "UPRIGHT", pitch: 2, roll: 0, imu: "OK", rssi_dbm: -58, ai: "RUNNING", refusal: null },
     link: { rtt_ms: 35, loss_pct: 0 } };
   const patch = (t, link, extra) => Object.assign({}, BASE, extra, { t: Object.assign({}, BASE.t, t), link: Object.assign({}, BASE.link, link) });
@@ -82,10 +82,20 @@
     }
   }
 
-  function sampleLog() {
-    const rows = [["14:02:11", 25, "ALERT_DEFECT score 6.4 (sample)"], ["14:01:48", 22, "ALERT_OBSTACLE front 24 cm (sample)"], ["14:01:20", 20, "LINK_BACK (sample)"]];
-    const tb = $("log-body"); tb.replaceChildren();
-    rows.forEach((r) => { const tr = document.createElement("tr"); r.forEach((c) => { const td = document.createElement("td"); td.textContent = c; td.title = c; tr.appendChild(td); }); tb.appendChild(tr); });
+  function sampleK15(view) {  // labelled sample path, pins and log lines for K15: never from the robot
+    const say = (n, detail) => document.dispatchEvent(new CustomEvent(n, { detail }));
+    const at = (h, m, sec) => new Date(2026, 10, 24, h, m, sec).getTime() / 1000;
+    for (let i = 0; i <= 60; i++) {
+      const f = i / 60;
+      say("kashimo-telemetry", { conn: "connected", sample: true, t: { x: 0.25 + f * 11.95, y: 0.2 * Math.sin(f * 9), yaw: 0.03, s: f * 12.4, imu: "OK" } });
+    }
+    const ev = (id, kind, ts, x, y, slab, data) => say("kashimo-event", { t: "EVENT", id, kind, ts, s: x, x, y, slab, pan: 90, tilt: 90, data: Object.assign({ sample: true }, data) });
+    ev(1, "LINK_BACK", at(14, 1, 20), 9.7, 0, 20, {});
+    ev(2, "ALERT_OBSTACLE", at(14, 1, 48), 10.7, -0.1, 22, { front_cm: 24 });
+    ev(3, "ALERT_DEFECT", at(14, 2, 11), 12.2, 0.2, 25, { score: 6.4 });
+    ev(4, "BUMP", at(14, 0, 40), 5.8, 0.1, 12, {});
+    say("kashimo-photo", { n: 1, file: null, slab: 15, ts: at(14, 0, 55), x: 7.1, y: -0.2, s: 7.3, sample: true });
+    say("kashimo-telemetry", Object.assign({ sample: true }, view));
   }
 
   window.KashimoView = { render, fixtures: FIXTURES };
@@ -94,7 +104,7 @@
     document.body.setAttribute("data-demo", name);
     render(FIXTURES[name] || FIXTURES.connected);
     document.querySelectorAll("button[data-code]").forEach((b) => { b.disabled = true; b.title = "Sample data: controls are off"; });
-    sampleLog();
+    sampleK15(FIXTURES[name] || FIXTURES.connected);
     if (!FIXTURES[name]) console.warn("unknown demo state:", name, "known:", Object.keys(FIXTURES).join(", "));
   }
 })();
