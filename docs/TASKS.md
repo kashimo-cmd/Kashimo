@@ -19,7 +19,7 @@ Status is what `main` contains on 25 Nov 2026 (after PR #14). IN PROGRESS = done
 | K06 | Drive | DONE (PC, fake HW) | `drive.py`, `tests/test_drive.py`, `docs/tasks/K06.md` | **NOT RUN** |
 | K07 | Head and rod | DONE (PC, fake HW) | `head.py`, `rod.py`, tests, `docs/tasks/K07.md` | **NOT RUN** |
 | K08 | IMU and position | DONE (PC, fake HW) | `imu.py`, `position.py`, tests, `docs/tasks/K08.md` | **NOT RUN** |
-| K09 | Controller main loop | IN PROGRESS, not merged | `main.py`, `ws_server.py`, `telemetry.py`, `events.py` | no |
+| K09 | Controller main loop | DONE (PC, mock HW) | `main.py`, `ws_server.py`, `telemetry.py`, `events.py`, tests, `docs/tasks/K09.md` | **NOT RUN** |
 | K11 | AI plug-in | IN PROGRESS, not merged | `pi/ai/` | no model integrated |
 | K16 | Pi tools | IN PROGRESS, not merged | `tools/bench_detector.py`, `calib_*.py`, `latency_test.py`, `record_normal.py` | no |
 | K17 | Deploy and verify | IN PROGRESS, not merged | `tools/verify.py` | waits for the 32 GB card |

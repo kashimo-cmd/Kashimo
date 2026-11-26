@@ -4,6 +4,7 @@ Format: [Keep a Changelog](https://keepachangelog.com). Versions are Git tags.
 
 ## [Unreleased]
 ### Added
+- K09 controller: 50 ms loop, 100 Hz IMU loop, watchdog 500 ms, WebSocket server (aiohttp), TELEMETRY 10 Hz, EVENTs in SQLite with SYNC replay, `/alerts/` and internal endpoints for the AI worker, simulated robot in mock mode.
 - K15 dashboard map (path, slab ticks, pins, distance to the hole) and alert log with picture viewer.
 - Documentation set: ARCHITECTURE, USER_MANUAL, TASKS, TESTING, IMPACT, phase 2 notes, REPO_GUIDE_FOR_AI.
 - `hardware/` (BOM, pin map, power), `results/` (empty result log and test report template), `ai/`, `media/`.
