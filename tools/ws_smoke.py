@@ -39,9 +39,10 @@ async def run(url, seconds, fwd, turn):
                 return 1
             seq += 1
             await ws.send(control(seq, *((fwd, turn) if driving_from is not None else (0, 0))))
+            deadline = time.monotonic() + C.HEARTBEAT_S  # the next CONTROL goes out on time even while messages keep arriving
             try:
-                while True:
-                    msg = P.decode(await asyncio.wait_for(ws.recv(), C.HEARTBEAT_S))
+                while (left := deadline - time.monotonic()) > 0:
+                    msg = P.decode(await asyncio.wait_for(ws.recv(), left))
                     if isinstance(msg, P.Telemetry):
                         tel = msg
                         first = first if first is not None and driving_from else (msg if driving_from else None)

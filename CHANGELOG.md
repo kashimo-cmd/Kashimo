@@ -11,6 +11,7 @@ Format: [Keep a Changelog](https://keepachangelog.com). Versions are Git tags.
 - CHANGELOG.md, CITATION.cff.
 
 ### Fixed
+- `tools/ws_smoke.py`: the heartbeat is now sent on a deadline. It waited for a quiet gap in the 10 Hz telemetry, so on a slow machine it stopped sending CONTROL and the controller (correctly) declared LINK_LOST.
 - `docs/tasks/K14.md`: test count corrected to 178 passed, 2 skipped.
 
 ## [0.2.0-pre] K04-K08 (merged, untagged)
