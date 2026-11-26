@@ -153,3 +153,7 @@ dialog#viewer::backdrop { background: var(--bg); opacity: .85; }
 .viewer-body img { width: 100%; height: auto; display: block; border: 1px solid var(--border); }
 .viewer-meta { margin: 0; padding: 0 var(--s3) var(--s3); }
 .log tbody tr { scroll-margin-top: calc(var(--s5) + var(--s1)); }  /* the sticky header must not cover a row that scrolls into view */
+
+/* capture panel: Photo and Screenshot side by side, Show file below */
+.cap-row { display: flex; gap: var(--s2); }
+.cap-row > button { flex: 1 1 0; min-width: 0; }

@@ -8,7 +8,7 @@
   const EMPTY = { state: "--", latch: false, fc: null, fl: null, fr: null, s: null, slab: null, pan: null, tilt: null, led: null,
     rod: "--", pitch: null, roll: null, imu: "--", rssi_dbm: null, ai: "--", refusal: null };
   const LABEL = { photo: "Photo", screenshot: "Screenshot" };
-  let cur = null, wasOn = false, optimistic = null, msgTimer = 0;
+  let cur = null, wasOn = false, optimistic = null, msgTimer = 0, last = null;  // last = newest saved file, relative to the run folder
   const busy = {};
 
   const link = L.create({
@@ -25,15 +25,26 @@
     if (level !== "err") msgTimer = setTimeout(() => { el.textContent = ""; el.removeAttribute("data-level"); }, 8000);
   }
 
+  const pageRect = () => {  // this page in screen pixels, so the server crops the screenshot to it (browser zoom must be 100 %)
+    const dpr = window.devicePixelRatio || 1, side = (window.outerWidth - window.innerWidth) / 2;
+    return { x: Math.round((window.screenX + side) * dpr), y: Math.round((window.screenY + window.outerHeight - window.innerHeight - side) * dpr),
+      w: Math.round(window.innerWidth * dpr), h: Math.round(window.innerHeight * dpr) };
+  };
+  const JSON_POST = { "Content-Type": "application/json" };
+
   async function capture(kind) {  // "saved" is shown only after the server confirms the file
     if (busy[kind]) return;
     busy[kind] = true;
     flash("Saving " + LABEL[kind].toLowerCase() + "...", "");
     const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 10000);
     try {
-      const r = await fetch("/api/" + kind, { method: "POST", signal: ctl.signal });
+      const opts = { method: "POST", signal: ctl.signal };
+      if (kind === "screenshot") Object.assign(opts, { headers: JSON_POST, body: JSON.stringify({ region: pageRect() }) });
+      const r = await fetch("/api/" + kind, opts);
       const b = await r.json().catch(() => ({}));
       if (r.ok && b.ok) {
+        last = b.file;
+        $("btn-show").disabled = false;
         if (kind === "photo") document.dispatchEvent(new CustomEvent("kashimo-photo", { detail: { n: b.n, file: b.file, slab: b.slab, ts: Date.now() / 1000, x: cur && cur.t ? cur.t.x : null, y: cur && cur.t ? cur.t.y : null, s: cur && cur.t ? cur.t.s : null } }));  // K15 pin: position from the last telemetry shown
         const slab = Number.isInteger(b.slab) ? " (slab " + String(b.slab).padStart(2, "0") + ")" : "";
         flash("Saved: " + LABEL[kind].toLowerCase() + " " + b.n + ", " + String(b.file).split("/").pop() + slab, "ok");
@@ -45,6 +56,19 @@
       busy[kind] = false;
     }
   }
+
+  async function showFile() {  // opens the file manager on the newest photo or screenshot
+    if (!last) return;
+    try {
+      const r = await fetch("/api/reveal", { method: "POST", headers: JSON_POST, body: JSON.stringify({ file: last }) });
+      const b = await r.json().catch(() => ({}));
+      if (r.ok && b.ok) flash("Opened the folder of " + last.split("/").pop(), "ok");
+      else flash("Failed: could not open the folder. " + (b.error || "server answered " + r.status), "err");
+    } catch (e) {
+      flash("Failed: could not open the folder. Dashboard server unreachable.", "err");
+    }
+  }
+  $("btn-show").addEventListener("click", showFile);
 
   const latch = () => (optimistic && performance.now() < optimistic.until ? optimistic.value : !!(cur && cur.t && cur.t.latch));
   const kb = K.bind({
@@ -101,5 +125,5 @@
   setInterval(tick, 100);
   tick();
   startVideo();
-  window.KashimoApp = { link, kb, capture };
+  window.KashimoApp = { link, kb, capture, showFile };
 })();

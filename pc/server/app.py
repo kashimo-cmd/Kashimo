@@ -14,7 +14,7 @@ from pathlib import Path
 import uvicorn
 import websockets
 import yaml
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -22,7 +22,7 @@ ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(ROOT))
 from common import constants as C  # noqa: E402
 from common import protocol as P  # noqa: E402
-from pc.server import csvlog, photo, screenshot  # noqa: E402
+from pc.server import csvlog, photo, reveal, screenshot  # noqa: E402
 
 ALERT_NAME = re.compile(r"^\d{6}(_heat)?\.jpg$")
 WINDOW_S = 10.0
@@ -243,14 +243,26 @@ def make_app(cfg=None, pi_ip=None, video="auto", runs=None):
         return {"ok": True, "n": st.n_photo, "file": f"photos/{path.name}", "slab": getattr(st.tel, "slab", None)}
 
     @app.post("/api/screenshot")
-    async def api_screenshot():
+    async def api_screenshot(request: Request):
+        region = screenshot.region_from(await request.body())  # the browser sends its window: dashboard only, else whole screen
         try:
-            path = await asyncio.to_thread(screenshot.save, st.run.sub("screenshots"), st.n_shot + 1)
+            path = await asyncio.to_thread(screenshot.save, st.run.sub("screenshots"), st.n_shot + 1, None, region)
         except Exception as exc:  # mss raises its own error types, a missing display is one of them
             return fail(500, f"screenshot failed: {exc}")
         st.n_shot += 1
         csvlog.append(st.run.path / "screenshots.csv", csvlog.row(time.time(), st.tel, frame=f"screenshots/{path.name}"))
-        return {"ok": True, "n": st.n_shot, "file": f"screenshots/{path.name}"}
+        return {"ok": True, "n": st.n_shot, "file": f"screenshots/{path.name}", "area": "screen" if region is None else "window"}
+
+    @app.post("/api/reveal")
+    async def api_reveal(request: Request):
+        path = reveal.inside(st.run.path, await request.body())
+        if path is None:
+            return fail(404, "file not found in this run folder")
+        try:
+            await asyncio.to_thread(reveal.show, path)
+        except OSError as exc:
+            return fail(500, f"could not open the file manager: {exc}")
+        return {"ok": True}
 
     @app.get("/api/status")
     def api_status():
