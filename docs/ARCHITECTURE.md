@@ -28,7 +28,7 @@ flowchart LR
 | `common/` | Message validation, constants, key map shared by PC and Pi | [BUILT] K02 |
 | `pi/video` | One ffmpeg: H.264 to MediaMTX, 2 fps JPEG for the AI, 60 s recording segments | [BUILT] K10, never run on the Pi |
 | `pi/controller` | `hw`, `sensors`, `drive`, `head`, `rod`, `imu`, `position` | [BUILT] K04-K08, fake hardware only |
-| `pi/controller` | `main` loop, `ws_server`, `telemetry`, `events`, watchdog wiring | [STUB on main] K09 in progress |
+| `pi/controller` | `main` loop, `ws_server`, `telemetry`, `events`, watchdog wiring | [BUILT] K09, mock hardware only |
 | `pi/ai` | Detector interface, dummy, ONNX loader, 3-in-a-row rule, worker | [STUB on main] K11 in progress |
 | `tools/fake_pi.py` | Stands in for the Pi so the PC side runs with no robot | [BUILT] K03 |
 

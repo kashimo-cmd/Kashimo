@@ -5,7 +5,7 @@
 Tracked robot for safe inspection of live cable galleries (IEEE IAS Challenge TSYP14, partner ACTIA). A Raspberry Pi 5 drives, streams video and runs the AI. One operator works from a web dashboard on a PC.
 Problem: the gallery is 30+ m long, cables are live up to 380 V, and two or more technicians crawl in to search a fault (about 2 h, ACTIA estimate). Details: [docs/phase2](docs/phase2/README.md).
 
-**Status (25 Nov 2026):** PC software (protocol, fake Pi, server, dashboard to K15) and Pi controller parts K04-K08 are done and tested on a PC only. K09, K11, K16, K17 are not merged. Nothing is run on the real Pi or robot, and there are no measured results yet. Per-task status: [docs/TASKS.md](docs/TASKS.md).
+**Status (25 Nov 2026):** PC software (protocol, fake Pi, server, dashboard to K15) and the Pi controller K04-K09 are done and tested on a PC only. K11, K16, K17 are not merged. Nothing is run on the real Pi or robot, and there are no measured results yet. Per-task status: [docs/TASKS.md](docs/TASKS.md).
 
 ## Docs
 [Index](docs/README.md) · [Design and contracts](docs/design.md) · [Architecture](docs/ARCHITECTURE.md) · [User manual](docs/USER_MANUAL.md) · [Testing](docs/TESTING.md) · [Hardware](hardware/README.md) · [Results](results/README.md) · [AI guide for assistants](docs/REPO_GUIDE_FOR_AI.md)

@@ -4,12 +4,14 @@ Format: [Keep a Changelog](https://keepachangelog.com). Versions are Git tags.
 
 ## [Unreleased]
 ### Added
+- K09 controller: 50 ms loop, 100 Hz IMU loop, watchdog 500 ms, WebSocket server (aiohttp), TELEMETRY 10 Hz, EVENTs in SQLite with SYNC replay, `/alerts/` and internal endpoints for the AI worker, simulated robot in mock mode.
 - K15 dashboard map (path, slab ticks, pins, distance to the hole) and alert log with picture viewer.
 - Documentation set: ARCHITECTURE, USER_MANUAL, TASKS, TESTING, IMPACT, phase 2 notes, REPO_GUIDE_FOR_AI.
 - `hardware/` (BOM, pin map, power), `results/` (empty result log and test report template), `ai/`, `media/`.
 - CHANGELOG.md, CITATION.cff.
 
 ### Fixed
+- `tools/ws_smoke.py`: the heartbeat is now sent on a deadline. It waited for a quiet gap in the 10 Hz telemetry, so on a slow machine it stopped sending CONTROL and the controller (correctly) declared LINK_LOST.
 - `docs/tasks/K14.md`: test count corrected to 178 passed, 2 skipped.
 
 ## [0.2.0-pre] K04-K08 (merged, untagged)

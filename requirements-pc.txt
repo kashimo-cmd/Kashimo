@@ -6,3 +6,4 @@ mss>=9,<11
 numpy>=1.26,<3
 PyYAML>=6,<7
 pytest>=8,<10
+aiohttp>=3.9,<4
